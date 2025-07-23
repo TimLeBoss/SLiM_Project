@@ -12,33 +12,32 @@ This notice aims to explain how this repository is organized. The folder is divi
 If a file or folder is missing in this notice, maybe it is not relevant
 
 
-
 I.	scripts 
 script folder contains all the slim script and workflow gwf to launch the simulation. It also contains the Jupyter files to analyze the output of simulations and construct the graphs.
-a.	WF_Vanilla
-WF_Vanilla folder contains the scripts files for the WF model.  
-i.	Test_Pop_15x50_WF
-Test_pop_15x50_WF folder contains the script to run and analyze the diversity in WF_Vanilla simulations with a subdivided population and no migration. Three files are in the folder: the slim script, the workflow and the Jupyter script.
-ii.	WF_Het_Pi_Wa
-WF_Het_Pi_Wa folder contains the script to run and analyze the diversity in WF_Vanilla simulations with different numbers of Ticks and 3 different estimators: Pi, Wa and heterozygosity. Three files are in the folder: the slim script, the workflow and the Jupyter script.
-b.	NWF_Vanilla
-NWF_Vanilla folder contains the scripts files for the NWF_V model.
-i.	Migrations
-Migrations folder contains scripts for the NWF_V model with a subdivided population and migrations.
-1.	NWFV_1MigV2
-NWFV_1MigV2 folder contains scripts to run and analyze the diversity in NWF_V simulations with only male migrations and one migration in a life of a male. This model is looking at the whole population and the one subpopulation diversities. Simulations are done with 2 different migration modes: Star and Circle. The folder contains slim scripts for both migration modes, the workflow and the jupyter script (first cell for the whole population diversity, and second cell for the one subpopulation one).
-2.	NWFV_MigV2
-NWFV_MigV2 folder contains scripts to run and analyze the diversity in NWF_V simulations with only male migrations. This model is only looking at the whole population diversity. Simulations are done with 3 different migration modes: Star, Circle and Steppingstones. The folder contains slim scripts for the three migration modes, the workflow and two jupyter scripts: 
--NWFV_MigV2_analyze: Analyze with probability to migrate from 0.05 to 1.0.
--NWFV_MigV2_lowproba_analyze: Analyze with low probability of migrations. This Files may not be updated and usable. 
-3.	NWFV_MigV2_subpop
-NWFV_MigV2_subpop folder contains scripts to run and analyze the diversity in NWF_V simulations with only male migrations. This model is only looking at the one subpopulation diversity. Simulations are done with 3 different migration modes: Star, Circle and Steppingstones. The folder contains slim scripts for the three migration modes, the workflow and two jupyter scripts: 
-- NWFV_MigV2_subpop_analyze: Analyze with probability to migrate from 0.05 to 1.0. The first cell of the script shows the mean diversity ratio of all the subpopulations, the second one the diversity ratio for only one subpopulation. 
-- NWFV_MigV2_lowproba_subpop_analyze: Analyze with low probability of migrations. This Files may not be updated and usable. 
-4.	NWFV_MigV2_OF
-NWFV_MigV2_OF folder contains scripts to run and analyze the diversity in NWF_V simulations with only female migrations. This model is looking at the whole population and the one subpopulation diversities. Simulations are done with 3 different migration modes: Star, Circle and Steppingstones. The folder contains slim scripts for the three migration modes, the workflow and the jupyter script (first cell for the whole population diversity, and second cell for the one subpopulation one).
-5.	NWF_MigV2_WMF
-NWFV_MigV2_WMF folder contains scripts to run and analyze the diversity in NWF_V simulations with male and female migrations. This model is looking at the whole population and the one subpopulation diversities. Simulations are done with 3 different migration modes: Star, Circle and Steppingstones. The folder contains slim scripts for the three migration modes, the workflow and the jupyter script (first cell for the whole population diversity, and second cell for the one subpopulation one).
+	a.	WF_Vanilla
+	WF_Vanilla folder contains the scripts files for the WF model.  
+		i.	Test_Pop_15x50_WF
+		Test_pop_15x50_WF folder contains the script to run and analyze the diversity in WF_Vanilla simulations with a subdivided population and no migration. Three files are in the folder: the slim 			script, the workflow and the Jupyter script.
+		ii.	WF_Het_Pi_Wa
+		WF_Het_Pi_Wa folder contains the script to run and analyze the diversity in WF_Vanilla simulations with different numbers of Ticks and 3 different estimators: Pi, Wa and heterozygosity. Three 		files are in the folder: the slim script, the workflow and the Jupyter script.
+	b.	NWF_Vanilla
+	NWF_Vanilla folder contains the scripts files for the NWF_V model.
+		i.	Migrations
+		Migrations folder contains scripts for the NWF_V model with a subdivided population and migrations.
+			1.	NWFV_1MigV2
+			NWFV_1MigV2 folder contains scripts to run and analyze the diversity in NWF_V simulations with only male migrations and one migration in a life of a male. This model is looking at the 			whole population and the one subpopulation diversities. Simulations are done with 2 different migration modes: Star and Circle. The folder contains slim scripts for both migration modes, 			the workflow and the jupyter script (first cell for the whole population diversity, and second cell for the one subpopulation one).
+			2.	NWFV_MigV2
+			NWFV_MigV2 folder contains scripts to run and analyze the diversity in NWF_V simulations with only male migrations. This model is only looking at the whole population diversity. 				Simulations are done with 3 different migration modes: Star, Circle and Steppingstones. The folder contains slim scripts for the three migration modes, the workflow and two jupyter 				scripts: 
+			-NWFV_MigV2_analyze: Analyze with probability to migrate from 0.05 to 1.0.
+			-NWFV_MigV2_lowproba_analyze: Analyze with low probability of migrations. This Files may not be updated and usable. 
+			3.	NWFV_MigV2_subpop
+			NWFV_MigV2_subpop folder contains scripts to run and analyze the diversity in NWF_V simulations with only male migrations. This model is only looking at the one subpopulation diversity. 			Simulations are done with 3 different migration modes: Star, Circle and Steppingstones. The folder contains slim scripts for the three migration modes, the workflow and two jupyter 				scripts: 
+			- NWFV_MigV2_subpop_analyze: Analyze with probability to migrate from 0.05 to 1.0. The first cell of the script shows the mean diversity ratio of all the subpopulations, the second one 			the diversity ratio for only one subpopulation. 
+			- NWFV_MigV2_lowproba_subpop_analyze: Analyze with low probability of migrations. This Files may not be updated and usable. 
+			4.	NWFV_MigV2_OF
+			NWFV_MigV2_OF folder contains scripts to run and analyze the diversity in NWF_V simulations with only female migrations. This model is looking at the whole population and the one subpopulation diversities. Simulations are done with 3 different migration modes: Star, Circle and Steppingstones. The folder contains slim scripts for the three migration modes, the workflow and the jupyter script (first cell for the whole population diversity, and second cell for the one subpopulation one).
+			5.	NWF_MigV2_WMF
+			NWFV_MigV2_WMF folder contains scripts to run and analyze the diversity in NWF_V simulations with male and female migrations. This model is looking at the whole population and the one subpopulation diversities. Simulations are done with 3 different migration modes: Star, Circle and Steppingstones. The folder contains slim scripts for the three migration modes, the workflow and the jupyter script (first cell for the whole population diversity, and second cell for the one subpopulation one).
 ii.	NWFV_HetPiWa_TICKS
 NWFV_HetPiWa_TICKS folder contains the script to run and analyze the diversity in NWF_V simulations with different numbers of Ticks and 3 different estimators: Pi, Wa and heterozygosity. Three files are in the folder: the slim script, the workflow and two Jupyter scripts:
  - NWFV_HetPiWa_analyze: boxplots of the genetic diversity and X-to-A ratio for each Number of Ticks and estimator

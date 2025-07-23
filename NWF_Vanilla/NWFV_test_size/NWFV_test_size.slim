@@ -1,0 +1,77 @@
+initialize() {
+	if (exists("slimgui")){
+		defineConstant("NUM",1);
+		defineConstant("SEXRATIO",0.5);
+		defineConstant("m",1);
+		defineConstant("K", 500);	// carrying capacity
+	}
+
+	initializeSLiMModelType("nonWF");
+	defineConstant("START",clock());
+	
+	initializeSLiMOptions(nucleotideBased=T);	
+	initializeSex();
+	defineConstant("LENGTH",1e8);
+
+	defineConstant("FOLDER","/mnt/primevo/work/timothe_dandoy/SLiM_Project/tmp/NWFV_test_size/");
+
+	
+	initializeMutationTypeNuc("m1", 0.5, "f", 0.0);
+	m1.convertToSubstitution = T;
+//	initializeMutationType("m2", 0.5, "f", 0.2);
+	initializeGenomicElementType("g1", m1, 1.0,mmJukesCantor(m*1.25e-8 / 3));
+//	initializeGenomicElementType("g2", c(m1,m2), c(10.0,1.0));
+	
+	initializeChromosome(1,LENGTH,type="A",symbol="A");
+	initializeAncestralNucleotides(randomNucleotides(LENGTH));
+	initializeGenomicElement(g1, 0, LENGTH-1);
+	initializeRecombinationRate(m*1e-8);
+	
+	initializeChromosome(2,LENGTH,type="X",symbol="X");
+	initializeAncestralNucleotides(randomNucleotides(LENGTH));
+	initializeGenomicElement(g1, 0, LENGTH-1);
+	initializeRecombinationRate(m*1e-8);
+	
+	initializeChromosome(3,LENGTH,type="Y",symbol="Y");
+	initializeAncestralNucleotides(randomNucleotides(LENGTH));
+	initializeGenomicElement(g1, 0, LENGTH-1);
+	initializeRecombinationRate(0);
+}
+
+// each individual reproduces itself once
+reproduction() {
+	for (pop in sim.subpopulations){
+		inds = pop.individuals;
+		females = inds[inds.sex == "F"];
+		males = inds[inds.sex == "M"];
+		females = sample(females,size(females));
+		males = sample(males,size(males));
+		Nrepro = min(size(females),size(males));
+		for (repro in 0:(Nrepro-1)){
+			pop.addCrossed(females[repro], males[repro],sex=SEXRATIO);
+		}
+	}
+	self.active = 0;
+}
+
+1 early() {
+	sim.addSubpop("p1",K,SEXRATIO);
+}
+
+early() {
+	p1.fitnessScaling = K / p1.individualCount;
+}
+
+10000 late() {
+	hapA = sim.subpopulations.haplosomesForChromosomes("A", includeNulls=F);
+	hapX = sim.subpopulations.haplosomesForChromosomes("X", includeNulls=F);
+   hapY = sim.subpopulations.haplosomesForChromosomes("Y", includeNulls=F);
+
+	PiA  = calcPi(hapA);
+	PiX  = calcPi(hapX);
+	PiY  = calcPi(hapY);
+	
+	Time= clock() - START;
+	
+	writeFile(FOLDER+"NWFV_size_K_"+K+"_m_"+m+"_"+NUM+".txt", paste(c(PiA,PiX,PiY,Time)));
+}

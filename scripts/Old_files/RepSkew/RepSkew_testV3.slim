@@ -1,0 +1,63 @@
+initialize() {
+	if (exists("slimgui")){
+		defineConstant("NUM",1);
+		defineConstant("F_P_M", 2);	// Number of female available at each row 
+	}
+
+	initializeSLiMModelType("nonWF");
+	defineConstant("K", 50);	// carrying capacity
+	
+	initializeSex();
+	defineConstant("SEXRATIO",0.5);
+	defineConstant("FOLDER","/mnt/primevo/work/timothe_dandoy/SLiM_Project/tmp/RepSkew_test/");
+}
+
+reproduction() {
+	for (pop in sim.subpopulations){
+		inds = pop.individuals;
+		females = inds[inds.sex == "F"];
+		males = inds[inds.sex == "M"];
+		males.tag = 0;
+		females = sample(females,size(females));
+		males = sortBy(males,"tagF");
+		//Beta_rep = dbeta(males.tagF,ALPHA,BETA);
+		count_male = 0;
+		for (i in 0:(size(females)-1)){
+			female = females[i];
+			if ((i-F_P_M > count_male) & (i<=size(males))){count_male = count_male+1;}
+			male = sample(males[0:count_male],1);
+			male.tag = male.tag + 1;
+			pop.addCrossed(female,male);
+		}
+	}
+	self.active = 0;
+}
+
+modifyChild(){
+	if (child.sex == "M") {
+		child.tagF = runif(1,0,1);
+		child.tag = 0;
+	}
+	return T;
+}
+ 
+1 early() {
+	sim.addSubpop("p1",50,SEXRATIO);
+	males = p1.individuals[p1.individuals.sex == "M"];
+	// absolute rank
+	males.tagF = runif(size(males),0,1);
+}
+
+early() {
+	p1.fitnessScaling = K / p1.individualCount;
+}
+
+//Caclul Rep Skew in last tick 
+1000 first() {
+	inds = sim.subpopulations.individuals;
+	males = inds[inds.sex == "M"];
+	r_males = males.tag;
+	
+	writeFile(FOLDER+"TestRepSkewV3:"+F_P_M+","+NUM+".txt", paste(r_males));
+}
+

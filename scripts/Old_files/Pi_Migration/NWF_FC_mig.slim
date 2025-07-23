@@ -1,0 +1,98 @@
+initialize() {
+	if (exists("slimgui")){
+		defineConstant("NUM",1);
+		//defineConstant("SURVIVAL",0.5); //Migration survival, between 0 and 1
+		defineConstant("PROB_MIG",0.05);
+
+	}
+
+	initializeSLiMModelType("nonWF");
+	defineConstant("K", 50);	// carrying capacity
+	defineConstant("SEXRATIO",0.5);
+	initializeSLiMOptions(nucleotideBased=T);	
+	initializeSex();
+	defineConstant("LENGTH",1e8);
+	defineConstant("FOLDER","/mnt/primevo/work/timothe_dandoy/SLiM_Project/tmp/Other_Migrations/");
+	
+	initializeMutationTypeNuc("m1", 0.5, "f", 0.0);
+	m1.convertToSubstitution = T;
+//	initializeMutationType("m2", 0.5, "f", 0.2);
+	initializeGenomicElementType("g1", m1, 1.0,mmJukesCantor(1.25e-8 / 3));
+//	initializeGenomicElementType("g2", c(m1,m2), c(10.0,1.0));
+	
+	initializeChromosome(1,LENGTH,type="A",symbol="A");
+	initializeAncestralNucleotides(randomNucleotides(LENGTH));
+	initializeGenomicElement(g1, 0, LENGTH-1);
+	initializeRecombinationRate(1e-8);
+	
+	initializeChromosome(2,LENGTH,type="X",symbol="X");
+	initializeAncestralNucleotides(randomNucleotides(LENGTH));
+	initializeGenomicElement(g1, 0, LENGTH-1);
+	initializeRecombinationRate(1e-8);
+
+}
+
+1 early() {
+	sim.addSubpop("p1",K,SEXRATIO);
+	sim.addSubpop("p2",K,SEXRATIO);
+	sim.addSubpop("p3",K,SEXRATIO);
+	sim.addSubpop("p4",K,SEXRATIO);
+	sim.addSubpop("p5",K,SEXRATIO);
+	sim.addSubpop("p6",K,SEXRATIO);
+	sim.addSubpop("p7",K,SEXRATIO);
+	sim.addSubpop("p8",K,SEXRATIO);
+	sim.addSubpop("p9",K,SEXRATIO);
+	sim.addSubpop("p10",K,SEXRATIO);
+}
+
+//Males Migration when adult (5 years old)
+2: first(){
+	males = sim.subpopulations.individuals[sim.subpopulations.individuals.sex == "M"];
+	males_adults = males[males.age >= 1];
+	prob = rbinom(size(males_adults),1,PROB_MIG);
+	Migrants = c(males_adults[prob == 1]); 
+	for (Migrant in Migrants){
+		pop = sample(sim.subpopulations[sim.subpopulations != Migrant.subpopulation],1);
+		pop.takeMigrants(Migrant);
+	}
+}
+
+//each female reproduce with one male, each male can reproduce with multiple females
+reproduction() {
+	for (pop in sim.subpopulations){
+		inds = pop.individuals;
+		females = inds[inds.sex == "F"];
+		males = inds[inds.sex == "M"];
+		//each female reproduce with one male, each male can reproduce multiple times
+		for (female in females){
+			pop.addCrossed(female, sample(males,1),sex=SEXRATIO);
+		}
+	}
+	self.active = 0;
+}
+
+//Baboon lives 15 years, then die 
+early() {
+	p1.fitnessScaling = K / p1.individualCount;
+	p2.fitnessScaling = K / p2.individualCount;
+	p3.fitnessScaling = K / p3.individualCount;
+	p4.fitnessScaling = K / p4.individualCount;
+	p5.fitnessScaling = K / p5.individualCount;
+	p6.fitnessScaling = K / p6.individualCount;
+	p7.fitnessScaling = K / p7.individualCount;
+	p8.fitnessScaling = K / p8.individualCount;
+	p9.fitnessScaling = K / p9.individualCount;
+	p10.fitnessScaling = K / p10.individualCount;				
+}
+
+
+10000 late() {
+
+	hapA = sim.subpopulations.haplosomesForChromosomes("A", includeNulls=F);
+	hapX = sim.subpopulations.haplosomesForChromosomes("X", includeNulls=F);
+	
+	PiA  = calcHeterozygosity(hapA);
+	PiX  = calcHeterozygosity(hapX);
+	
+	writeFile(FOLDER+"Mig_NoAge:"+PROB_MIG+","+NUM+".txt", paste(c(PiA,PiX)));
+}

@@ -1,0 +1,92 @@
+initialize() {
+	if (exists("slimgui")){
+		defineConstant("NUM",1);
+		defineConstant("PROB_MIG",1.0);
+	}
+
+	initializeSLiMModelType("nonWF");
+	defineConstant("K", 50);	// carrying capacity
+	defineConstant("SEXRATIO",0.5);
+	initializeSLiMOptions(nucleotideBased=T);	
+	initializeSex();
+	defineConstant("LENGTH",1e8);
+
+	defineConstant("FOLDER","/mnt/primevo/work/timothe_dandoy/SLiM_Project/tmp/Test_Mig_subpop_NWFV/");
+
+	
+	initializeMutationTypeNuc("m1", 0.5, "f", 0.0);
+	m1.convertToSubstitution = T;
+//	initializeMutationType("m2", 0.5, "f", 0.2);
+	initializeGenomicElementType("g1", m1, 1.0,mmJukesCantor(1.25e-8 / 3));
+//	initializeGenomicElementType("g2", c(m1,m2), c(10.0,1.0));
+	
+	initializeChromosome(1,LENGTH,type="A",symbol="A");
+	initializeAncestralNucleotides(randomNucleotides(LENGTH));
+	initializeGenomicElement(g1, 0, LENGTH-1);
+	initializeRecombinationRate(1e-8);
+	
+	initializeChromosome(2,LENGTH,type="X",symbol="X");
+	initializeAncestralNucleotides(randomNucleotides(LENGTH));
+	initializeGenomicElement(g1, 0, LENGTH-1);
+	initializeRecombinationRate(1e-8);
+	
+	initializeChromosome(3,LENGTH,type="Y",symbol="Y");
+	initializeAncestralNucleotides(randomNucleotides(LENGTH));
+	initializeGenomicElement(g1, 0, LENGTH-1);
+	initializeRecombinationRate(0);
+}
+
+// each individual reproduces itself once
+reproduction() {
+	for (pop in sim.subpopulations){
+		inds = pop.individuals;
+		females = inds[inds.sex == "F"];
+		males = inds[inds.sex == "M"];
+		females = sample(females,size(females));
+		males = sample(males,size(males));
+		Nrepro = min(size(females),size(males));
+		for (repro in 0:(Nrepro-1)){
+			pop.addCrossed(females[repro], males[repro],sex=SEXRATIO);
+		}
+	}
+	self.active = 0;
+}
+
+1 early() {
+	for (i in 1:10){
+		sim.addSubpop(i,50,SEXRATIO);
+	}
+	deleteFile(FOLDER+"NWFV_Subpop_circle_Migration"+PROB_MIG+","+NUM+".txt");
+}
+
+2: first(){
+	males = sim.subpopulations.individuals[sim.subpopulations.individuals.sex == "M"];
+	males_adults = males[males.age >= 1];
+	prob = rbinom(size(males_adults),1,PROB_MIG);
+	Migrants = c(males_adults[prob == 1]); 
+	for (Migrant in Migrants){
+		id_pop_migrant = Migrant.subpopulation.id;
+		id_tirage = sample(c(id_pop_migrant-1,id_pop_migrant+1),1);
+		if (id_tirage == 0){id_tirage = 10;}
+		if (id_tirage == 11){id_tirage = 1;}
+		sim.subpopulations[id_tirage-1].takeMigrants(Migrant);
+	}
+}
+
+early() {
+	sim.subpopulations.fitnessScaling = K / sim.subpopulations.individualCount;
+}
+
+10000 late() {
+	for (pop in sim.subpopulations){ 
+		hapA = pop.haplosomesForChromosomes("A", includeNulls=F);
+		hapX = pop.haplosomesForChromosomes("X", includeNulls=F);
+   	hapY = pop.haplosomesForChromosomes("Y", includeNulls=F);
+
+		PiA  = calcPi(hapA);
+		PiX  = calcPi(hapX);
+		PiY  = calcPi(hapY);
+		
+		writeFile(FOLDER+"NWFV_Subpop_circle_Migration"+PROB_MIG+","+NUM+".txt", paste(c(PiA,PiX,PiY)),append = T);
+	}
+}

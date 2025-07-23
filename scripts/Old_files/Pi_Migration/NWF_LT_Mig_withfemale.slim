@@ -1,0 +1,106 @@
+initialize() {
+	if (exists("slimgui")){
+		defineConstant("NUM",1);
+		//defineConstant("SURVIVAL",0.5); //Migration survival, between 0 and 1
+		defineConstant("PROB_MIG",0.05);
+
+	}
+	
+	defineConstant("SEXRATIO",0.5);
+	initializeSLiMModelType("nonWF");
+	defineConstant("K", 50);	// carrying capacity
+
+	
+	initializeSLiMOptions(nucleotideBased=T);	
+	initializeSex();
+	defineConstant("LENGTH",1e8);
+	defineConstant("FOLDER","/mnt/primevo/work/timothe_dandoy/SLiM_Project/tmp/Other_Migrations/");
+	
+		// Life tables provided by Fernando
+	defineConstant("L_F", c(0.215909091, 0.092391304, 0.045908184, 0.054393305, 0.037610619, 0.03908046, 0.04784689, 0.037688442, 0.041775457, 0.046321526, 0.034285714, 0.065088757, 0.060126582, 0.087542088, 0.081180812, 0.088353414, 0.083700441, 0.125, 0.093406593, 0.163636364, 0.115942029, 0.147540984, 0.240384615, 0.164556962, 0.333333333, 0.363636364, 0.428571429, 1));
+	defineConstant("L_M", c(0.215809285, 0.096, 0.076106195, 0.057471264, 0.042682927, 0.050955414, 0.049217002, 0.058823529, 0.06, 0.02393617, 0.068119891, 0.067251462, 0.112852665, 0.091872792, 0.112840467, 0.140350877, 0.137755102, 0.165680473, 0.219858156, 0.254545455, 0.329268293, 0.345454545, 0.416666667, 0.476190476, 1, 1, 1, 1));
+	// Bronikowski et al. 
+	defineConstant("fertility_F", c(0.000, 0.000, 0.000, 0.000, 0.005, 0.211, 0.264, 0.272, 0.279, 0.281, 0.269, 0.276, 0.290, 0.291, 0.285, 0.274, 0.263, 0.271, 0.271, 0.236, 0.233, 0.259, 0.047, 0.108, 0.000, 0.000, 0.000, 0.000));
+	
+	initializeMutationTypeNuc("m1", 0.5, "f", 0.0);
+	m1.convertToSubstitution = T;
+//	initializeMutationType("m2", 0.5, "f", 0.2);
+	initializeGenomicElementType("g1", m1, 1.0,mmJukesCantor(1.25e-8 / 3));
+//	initializeGenomicElementType("g2", c(m1,m2), c(10.0,1.0));
+	
+	initializeChromosome(1,LENGTH,type="A",symbol="A");
+	initializeAncestralNucleotides(randomNucleotides(LENGTH));
+	initializeGenomicElement(g1, 0, LENGTH-1);
+	initializeRecombinationRate(1e-8);
+	
+	initializeChromosome(2,LENGTH,type="X",symbol="X");
+	initializeAncestralNucleotides(randomNucleotides(LENGTH));
+	initializeGenomicElement(g1, 0, LENGTH-1);
+	initializeRecombinationRate(1e-8);
+	
+	initializeChromosome(3,LENGTH,type="Y",symbol="Y");
+	initializeAncestralNucleotides(randomNucleotides(LENGTH));
+	initializeGenomicElement(g1, 0, LENGTH-1);
+	initializeRecombinationRate(0);
+}
+
+1 early() {
+	sim.addSubpop("p1",K,SEXRATIO);
+	sim.addSubpop("p2",K,SEXRATIO);
+	sim.addSubpop("p3",K,SEXRATIO);
+	sim.addSubpop("p4",K,SEXRATIO);
+	sim.addSubpop("p5",K,SEXRATIO);
+	sim.addSubpop("p6",K,SEXRATIO);
+	sim.addSubpop("p7",K,SEXRATIO);
+	sim.addSubpop("p8",K,SEXRATIO);
+	sim.addSubpop("p9",K,SEXRATIO);
+	sim.addSubpop("p10",K,SEXRATIO);
+	
+	sim.subpopulations.individuals.age = rdunif(1,0,27);
+}
+
+//Males Migration when adult (5 years old)
+2: first(){
+	inds = sim.subpopulations.individuals;
+	inds_adults = inds[inds.age >= 5];
+	prob = rbinom(size(inds_adults),1,PROB_MIG);
+	Migrants = c(inds_adults[prob == 1]); 
+	for (Migrant in Migrants){
+		pop = sample(sim.subpopulations[sim.subpopulations != Migrant.subpopulation],1);
+		pop.takeMigrants(Migrant);
+	}
+}
+
+//each female reproduce with one male, each male can reproduce with multiple females
+reproduction(NULL,"F") {
+	if (sample(c(T, F), 1, weights = c(fertility_F[individual.age], 1-fertility_F[individual.age]))){
+		mate = subpop.sampleIndividuals(1, sex ="M", minAge=5);
+		if (size(mate) != 0){subpop.addCrossed(individual, mate,sex=SEXRATIO);}
+	}
+}
+
+early() {
+	// Change individual mortality based on sex-dependent life table
+	inds = sim.subpopulations.individuals;
+	ages = inds.age;
+	sexes = inds.sex;
+	mortality = ifelse(sexes == "F", L_F[ages], L_M[ages]);
+	survival = 1 - mortality;
+	inds.fitnessScaling = survival;
+	// density-dependence, factoring in individual mortality
+	if (!isNULL(mean(survival))){sim.subpopulations.fitnessScaling = K / (sim.subpopulations.individualCount * mean(survival));}	
+}
+
+
+10000 late() {
+
+	hapA = sim.subpopulations.haplosomesForChromosomes("A", includeNulls=F);
+	hapX = sim.subpopulations.haplosomesForChromosomes("X", includeNulls=F);
+	hapY = sim.subpopulations.haplosomesForChromosomes("Y", includeNulls=F);
+	
+	PiA  = calcHeterozygosity(hapA);
+	PiX  = calcHeterozygosity(hapX);
+	PiY  = calcHeterozygosity(hapY);
+	
+	writeFile(FOLDER+"Mig_WithFemale:"+PROB_MIG+","+NUM+".txt", paste(c(PiA,PiX,PiY)));
+}

@@ -1,0 +1,49 @@
+initialize() {
+	if (exists("slimgui")){
+		defineConstant("NUM",1);
+	}
+	initializeSLiMModelType("nonWF");
+	defineConstant("K", 50);	// carrying capacity
+	
+	initializeSex();
+	defineConstant("SEXRATIO",0.5);
+	defineConstant("FOLDER","/mnt/primevo/work/timothe_dandoy/SLiM_Project/tmp/RepSkew_test/");
+}
+
+reproduction() {
+	for (pop in sim.subpopulations){
+		inds = pop.individuals;
+		females = inds[inds.sex == "F"];
+		males = inds[inds.sex == "M"];
+		males.tag = 0;
+		for (female in females){
+			male = sample(males,1);
+			pop.addCrossed(female,male);
+			male.tag = male.tag + 1;
+		}
+	}
+	self.active = 0;
+}
+
+modifyChild(){
+	if (child.sex == "M") {
+		child.tag = 0;
+	}
+	return T;
+}
+ 
+1 early() {
+	sim.addSubpop("p1",50,SEXRATIO);
+}
+
+early() {
+	p1.fitnessScaling = K / p1.individualCount;
+}
+
+1000 first() {
+	inds = sim.subpopulations.individuals;
+	males = inds[inds.sex == "M"];
+	r_males = males.tag;
+	
+	writeFile(FOLDER+"TestRepSkewV0:"+NUM+".txt", paste(r_males));
+}

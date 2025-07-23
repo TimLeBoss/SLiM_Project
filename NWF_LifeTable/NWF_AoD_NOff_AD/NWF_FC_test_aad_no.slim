@@ -1,0 +1,55 @@
+initialize() {
+	if (exists("slimgui")){
+		defineConstant("SEXRATIO",0.5);
+		defineConstant("K", 750);	// carrying capacity
+	}
+
+	initializeSLiMModelType("nonWF");
+
+	initializeSLiMOptions(keepPedigrees=T);	
+	initializeSex();
+
+	defineConstant("FOLDER","/mnt/primevo/work/timothe_dandoy/SLiM_Project/tmp/NWF_LifeTable/NWF_AoD_NOff_AD/");
+}
+
+// each individual reproduces itself once
+reproduction() {
+	for (pop in sim.subpopulations){
+		inds = pop.individuals;
+		females = inds[inds.sex == "F"];
+		males = inds[inds.sex == "M"];
+		//each female reproduce with one male, each male can reproduce multiple times
+		for (female in females){
+			pop.addCrossed(female, sample(males,1),sex=SEXRATIO);
+		}
+	}
+	self.active = 0;
+}
+
+1 early() {
+	sim.addSubpop("p1",K,SEXRATIO);
+	deleteFile(FOLDER+"NWFFC_aod_no.txt");
+}
+
+early() {
+	p1.fitnessScaling = K / p1.individualCount;
+}
+
+1000: survival() {
+	if (!surviving) {
+		// log the death
+		line = individual.sex+" "+paste(individual.age,individual.reproductiveOutput);
+		writeFile(FOLDER+"NWFFC_aod_no.txt",line, append=T);
+	}
+	return NULL;
+}
+
+5000 late() {
+	inds = sim.subpopulations.individuals;
+	for (ind in inds) {
+		writeFile(FOLDER+"NWFFC_ad.txt",ind.sex+" "+paste(ind.age), append=T);
+	}
+}
+
+10000 late() {
+}

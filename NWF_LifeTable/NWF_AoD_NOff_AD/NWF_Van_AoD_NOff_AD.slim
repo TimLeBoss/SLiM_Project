@@ -1,0 +1,56 @@
+initialize() {
+	if (exists("slimgui")){
+      defineConstant("SEXRATIO",0.5);
+      defineConstant("K",750);
+	}
+	initializeSLiMModelType("nonWF");
+	initializeSLiMOptions(keepPedigrees=T);
+		
+	initializeSex();
+	defineConstant("FOLDER","/mnt/primevo/work/timothe_dandoy/SLiM_Project/tmp/NWF_LifeTable/NWF_AoD_NOff_AD/");	
+}
+
+
+reproduction() {
+	for (pop in sim.subpopulations){
+		inds = pop.individuals;
+		females = inds[inds.sex == "F"];
+		males = inds[inds.sex == "M"];
+		females = sample(females,size(females));
+		males = sample(males,size(males));
+		Nrepro = min(size(females),size(males));
+		for (repro in 0:(Nrepro-1)){
+			pop.addCrossed(females[repro], males[repro],sex=SEXRATIO);
+		}
+	}
+	self.active = 0;
+}
+
+1 early() {
+	sim.addSubpop("p1",K,SEXRATIO);
+	deleteFile(FOLDER+"Test_ageatdeath_offsprings.txt");
+}
+
+early() {
+	p1.fitnessScaling = K / p1.individualCount;
+}
+
+1000: survival() {
+	if (!surviving) {
+		// log the death
+		line = individual.sex+" "+paste(individual.age,individual.reproductiveOutput);
+		writeFile(FOLDER+"NWFV_aod_no.txt",line, append=T);
+	}
+	return NULL;
+}
+
+5000 late() {
+	inds = sim.subpopulations.individuals;
+	for (ind in inds){
+		writeFile(FOLDER+"NWFV_ad.txt",ind.sex+" "+paste(ind.age), append=T);
+	}
+	
+}
+
+10000 late() {
+}

@@ -1,0 +1,31 @@
+initialize() {
+	if (exists("slimgui")){
+		defineConstant("NUM",1);
+		defineConstant("NIND",68);
+		defineConstant("Length", 1e8);
+	}
+
+	defineConstant("FASTA","/mnt/primevo/work/timothe_dandoy/SLiM_Project/data/Reel_Amboseli_Yellow/Fasta_Files_format/"+NUM+".fasta");
+	defineConstant("VCF","/mnt/primevo/work/timothe_dandoy/SLiM_Project/data/Reel_Amboseli_Yellow/VCF_Files/ref.shapeit_all."+NUM+".yellow.recode.vcf");
+	defineConstant("FOLDER","/mnt/primevo/work/timothe_dandoy/SLiM_Project/tmp/Reel_Data/Yellow/");
+	
+	initializeSLiMOptions(nucleotideBased=T);
+	length = initializeAncestralNucleotides(FASTA);
+	initializeSex();
+
+	initializeMutationTypeNuc("m1", 0.5, "f", 0.0);
+	initializeGenomicElementType("g1", m1, 1.0, mmJukesCantor(0.0));
+	initializeGenomicElement(g1, 0, Length-1);
+	initializeRecombinationRate(1e-8);
+}
+
+1 late() {
+	sim.addSubpop("p1", 68);
+	p1.individuals.readIndividualsFromVCF(VCF, m1);
+	
+	hap = sim.subpopulations.haplosomesForChromosomes(includeNulls=F);
+	
+	Pi  = calcPi(hap);
+
+	writeFile(FOLDER+"reel_pi_SLiM_"+NUM+".txt", paste(c(Pi)));
+}

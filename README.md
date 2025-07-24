@@ -131,3 +131,13 @@ Yellow folder contains the script to analyze the bcf files of the anubis baboon 
 Old_Files folder contains some previous scripts files and folders that are not used anymore. They are not updated.
 ### I.g.	Test
 Test folder contains some test files and folders that are not relevant for the project.
+
+
+## II.	done
+done folder contains all the figures from the jupyter analyzes in scripts. The structure of done is the same as the scripts one except for some differences. The differences are:
+-	Migrations of NWF_FemaleChoice, RepSkew_Selection, NWFV_Test_Size and Test_Pop15x50_WF do not exist.
+-	All hybridization results are in Hybridization
+-	All migration results are in Migrations, for both NWF_V and NWF_LT models.
+-	All selection results are in Selection
+-	All reel data results are in Reel_Data
+

@@ -24,13 +24,13 @@ WF_Het_Pi_Wa folder contains the script to run and analyze the diversity in WF_V
 NWF_Vanilla folder contains the scripts files for the NWF_V model.
 #### i.	Migrations
 Migrations folder contains scripts for the NWF_V model with a subdivided population and migrations.
-##### 1.	NWFV_1MigV2
+##### 1. NWFV_1MigV2
 NWFV_1MigV2 folder contains scripts to run and analyze the diversity in NWF_V simulations with only male migrations and one migration in a life of a male. This model is looking at the whole population and the one subpopulation diversities. Simulations are done with 2 different migration modes: Star and Circle. The folder contains slim scripts for both migration modes, the workflow and the jupyter script (first cell for the whole population diversity, and second cell for the one subpopulation one).
-##### 2.	NWFV_MigV2
+##### 2. NWFV_MigV2
 NWFV_MigV2 folder contains scripts to run and analyze the diversity in NWF_V simulations with only male migrations. This model is only looking at the whole population diversity. Simulations are done with 3 different migration modes: Star, Circle and Steppingstones. The folder contains slim scripts for the three migration modes, the workflow and two jupyter scripts: 
 -NWFV_MigV2_analyze: Analyze with probability to migrate from 0.05 to 1.0.
 -NWFV_MigV2_lowproba_analyze: Analyze with low probability of migrations. This Files may not be updated and usable. 
-##### 3.	NWFV_MigV2_subpop
+##### 3.NWFV_MigV2_subpop
 NWFV_MigV2_subpop folder contains scripts to run and analyze the diversity in NWF_V simulations with only male migrations. This model is only looking at the one subpopulation diversity. Simulations are done with 3 different migration modes: Star, Circle and Steppingstones. The folder contains slim scripts for the three migration modes, the workflow and two jupyter scripts: 
 - NWFV_MigV2_subpop_analyze: Analyze with probability to migrate from 0.05 to 1.0. The first cell of the script shows the mean diversity ratio of all the subpopulations, the second one the diversity ratio for only one subpopulation. 
 - NWFV_MigV2_lowproba_subpop_analyze: Analyze with low probability of migrations. This Files may not be updated and usable. 

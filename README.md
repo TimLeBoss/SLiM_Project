@@ -2,10 +2,10 @@
 
 This repository contain all the files that have been used for the SLiM_Project of Timothé Dandoy, at the Max Planck Institute for Evolutionary Anthropology in Leipzig, named : Disentangling how selection, demography, and sex-biased behavior influence genetic diversity using field study–informed genetic simulations.
 
-Here is a notice that explain where each files can be found :
+Here is a manual that explain where each files can be found :
 
 
-This notice aims to explain how this repository is organized. The folder is divided into 2 subfolders:
+This manual aims to explain how this repository is organized. The folder is divided into 2 subfolders:
   -	 Scripts: With all the SLiM scripts, workflow, and jupyter scripts
   -	 Done: Graphs images of the results
 
